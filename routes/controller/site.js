@@ -2,6 +2,8 @@ const fs = require('fs');
 const moment = require('moment');
 const join = require('path').join;
 const send = require('koa-send');
+
+const PassThrough = require('stream').PassThrough;
 moment.locale('zh-cn');
 
 exports.homepage = async function(ctx, next) {
@@ -27,6 +29,67 @@ exports.file = async function(ctx, next) {
   }
 }
 
+exports.video = async function(ctx, next) {
+  let path = ctx.query.path;
+  if (path.slice(0, 1) == '/') path = path.slice(1, path.length);
+  let name = ctx.query.name;
+  let realPath = join(path, name); //getPath(['public', 'documents', 'video', name]);
+
+  if (ctx.headers.range) {
+
+    let fileSize = fs.statSync(realPath).size;
+
+    function getRange(){
+      var range = ctx.headers.range;
+      
+      if(range.indexOf(",") != -1) {//这里只处理了一个分段的情况
+          return false;
+      }
+      //range大约长这样子：bytes=0-255[,256-511]
+      var parts = range.replace(/bytes=/, '').split("-");
+      var partiaStart = parts[0];
+      var partialEnd = parts[1];
+
+      var start = parseInt(partiaStart);//起始位置
+      //如果是bytes=0-，就是整个文件大小了
+      var end = partialEnd ? parseInt(partialEnd) : fileSize - 1;
+
+      if(isNaN(start) || isNaN(end)) return false;
+      //分段的大小
+      var chunkSize = end - start + 1;
+
+      return {'start': start, 'end': end, 'chunkSize': chunkSize};
+    }
+
+    var rangeData = getRange();
+
+    if (rangeData) {
+      var stream = fs.createReadStream(realPath, {start: rangeData.start, end: rangeData.end});
+      ctx.status = 206;
+      ctx.set('Accept-Ranges', 'bytes');
+      ctx.set('Content-Length', rangeData.chunkSize);    
+      ctx.set('Content-Range', `bytes ${rangeData.start}-${rangeData.end}/${fileSize}`);
+      ctx.type = 'application/octet-stream';
+      ctx.body = stream.on('error', ctx.onerror).pipe(PassThrough());
+    }
+  }
+}
+
+/**
+ * 把文件夹数组转为路径
+ */
+function getPath(arr) {
+  if (arr.length <= 1) {
+    return arr[0]
+  } else {
+    let path = arr[0];
+    for (var i = 1; i < arr.length; i++) {
+      path = join(path, arr[i]);
+    }
+    return path;
+  }
+}
+
 /**
  * 获取文件信息
  * @param {JSON} path 
@@ -40,7 +103,7 @@ function findFilesSync(path) {
       if (val.substr(0, 1) != '.') {
 
         let fileInfo = {
-          type: stats.isFile(),
+          isFile: stats.isFile(),
           name: val
         }
         if (stats.isFile()) {
