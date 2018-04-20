@@ -1,0 +1,120 @@
+script(type="text/javascript").
+  // 固定导航栏
+  $(document).ready(function (e) {
+    $('#test').scrollToFixed();
+    $('.res-nav_click').click(function () {
+      $('.main-nav').slideToggle();
+      return false
+    });
+  });
+
+script(type="text/javascript").
+  // team 模块动画
+  wow = new WOW({
+    animateClass: 'animated',
+    offset: 100
+  });
+  wow.init();
+
+script(type="text/javascript").
+
+  // 导航栏点击移动到对应div动画
+  $(function () {
+
+    $('.main-nav li a, .servicelink').bind('click', function (event) {
+      var $anchor = $(this);
+
+      //- $('html, body').stop().animate({
+      //-   scrollTop: $($anchor.attr('href')).offset().top - 93
+      //- }, 1500, 'easeInOutExpo');
+      
+      // if you don't want to use the easing effects:
+      $('html, body').stop().animate({
+        scrollTop: $($anchor.attr('href')).offset().top - 93
+      }, 1000);
+      
+      if ($(window).width() < 768) {
+        $('.main-nav').hide();
+      }
+      event.preventDefault();
+    });
+  })
+
+script(type="text/javascript").
+  $(function () {
+
+    var $container = $('.portfolioContainer'),
+      $body = $('body'),
+      colW = 375,
+      columns = null;
+
+    $container.isotope({
+      // disable window resizing
+      resizable: true,
+      masonry: {
+        columnWidth: colW
+      }
+    });
+
+    $(window).smartresize(function () {
+      // check if columns has changed
+      var currentColumns = Math.floor(($body.width() - 30) / colW);
+      if (currentColumns !== columns) {
+        // set new column count
+        columns = currentColumns;
+        // apply width to container manually, then trigger relayout
+        $container.width(columns * colW)
+          .isotope('reLayout');
+      }
+
+    }).smartresize(); // trigger resize to set container width
+    $('.portfolioFilter a').click(function () {
+      $('.portfolioFilter .current').removeClass('current');
+      $(this).addClass('current');
+
+      var selector = $(this).attr('data-filter');
+      $container.isotope({
+
+        filter: selector,
+      });
+      return false;
+    });
+
+  });
+
+//- script.
+//-   var player = null
+//-   $(document).ready(function() {
+
+//-     $('#myModal').on('hidden.bs.modal', function(e) {
+//-       if (player && player.pause) player.pause();
+//-     })
+
+//-     $('#videoBtn').click(function(e) {
+//-       var video = $(this).data('video');
+//-       var image = $(this).attr('src');
+//-       $('#myModal').modal('show');
+
+//-       if (!player) {
+//-         player = new DPlayer({
+//-           container: document.getElementById('videoModal'), 
+//-           screenshot: true,
+//-           video: {
+//-             url: video,
+//-             pic: image,
+//-             thumbnails: image
+//-           },
+//-           autoplay: true,
+//-           long: 'zh-cn'
+//-         })
+//-       } else {
+//-         player.switchVideo({
+//-           url: video,
+//-           pic: image,
+//-           type: 'auto'
+//-         })
+//-         player.play();
+//-       }
+//-     })
+//-   })
+

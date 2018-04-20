@@ -1,0 +1,25 @@
+extends ../../layouts/default
+
+block title
+  title Home
+
+block content
+
+  include ./view/header
+  
+  include ../../includes/navigator
+
+  include ./view/demo
+
+  include ./view/download
+
+  include ./view/team
+
+  include ../../includes/footer
+
+  #myModal.modal.fade.bd-example-modal-lg(tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel", aria-hidden="true")
+    .modal-dialog.modal-lg
+      #videoModal.modal-content
+
+  include ./js
+  

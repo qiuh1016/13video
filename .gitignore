@@ -1,0 +1,15 @@
+public/documents/*
+public/logs/*
+public/img/*
+node_modules
+
+# Ignore Mac OS desktop services store
+.DS_Store
+
+# Ignore Windows desktop setting file
+desktop.ini
+
+*.log
+
+*.pdf
+*.docx

@@ -1,0 +1,38 @@
+extends ../../layouts/default
+
+block title
+  title File
+
+block content
+
+  include ../../includes/navigator
+
+  .container
+    ol.breadcrumb
+      - let href = '/file?path='
+      each dir in pathArr
+        - href = join(href, dir)
+        li
+          a(href=href) #{dir}
+
+    ul.list-group
+      each file in fileArr
+        li.list-group-item
+          a(href='/file?path=' + path + '/' + file.name)
+            - var attr = {}
+            - attr.class = file.icon
+            i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
+            | #{file.name}
+
+          
+  //- include ../../includes/footer
+  footer
+    .container
+      p
+      | &copy; 2018 | CETCME
+      i.fa.fa-value(aria-hidden='true') &nbsp;
+  
+  script(type="text/javascript").
+    $(function() {
+      $('ul.main-nav li.small-logo a').attr('href', '/');
+    })
