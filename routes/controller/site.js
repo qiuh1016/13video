@@ -105,7 +105,8 @@ function findFilesSync(path) {
 
         let fileInfo = {
           isFile: stats.isFile(),
-          name: val
+          name: val,
+          size: formatfileSize(stats.size)
         }
         if (stats.isFile()) {
           fileInfo.icon = getIconByFileType(val);
@@ -116,6 +117,13 @@ function findFilesSync(path) {
       }
   });
   return result;
+}
+
+function formatfileSize(size) {
+  if (size < 1024) return size + 'B';
+  if (size < 1024 * 1024) return (size / 1024).toFixed(2) + 'KB';
+  if (size < 1024 * 1024 * 1024) return (size / 1024 / 1024).toFixed(2) + 'MB';
+  if (size < 1024 * 1024 * 1024 * 1024) return (size / 1024 / 1024 / 1024).toFixed(2) + 'GB';
 }
 
 /**

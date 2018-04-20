@@ -24,12 +24,15 @@ block content
               - attr.class = file.icon
               i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
               | #{file.name}
+              label(style='float:right') #{file.size}
           else  
             a(href='/file?path=' + path + '/' + file.name)
               - var attr = {}
               - attr.class = file.icon
               i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
               | #{file.name}
+              if (file.isFile)
+                label(style='float:right') #{file.size}
 
   footer
     .container
