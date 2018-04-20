@@ -11,6 +11,7 @@ exports.homepage = async function(ctx, next) {
   });
 }
 
+
 exports.file = async function(ctx, next) {
   let path = ctx.query.path || '/public';
   dirPath = __dirname + '/../../' + path;
@@ -31,7 +32,7 @@ exports.file = async function(ctx, next) {
 
 exports.video = async function(ctx, next) {
   let path = ctx.query.path;
-  if (path.slice(0, 1) == '/') path = path.slice(1, path.length);
+  if (path.slice(0, 1) == '/' || path.slice(0, 1) == '\\') path = path.slice(1, path.length);
   let name = ctx.query.name;
   let realPath = join(path, name); //getPath(['public', 'documents', 'video', name]);
 
