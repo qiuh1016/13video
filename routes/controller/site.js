@@ -13,7 +13,7 @@ exports.homepage = async function(ctx, next) {
 
 
 exports.file = async function(ctx, next) {
-  let path = ctx.query.path || '/public';
+  let path = ctx.query.path || 'public';
   dirPath = getPath([__dirname, '..', '..', path]); //__dirname + '/../../' + path;
   let stats = fs.statSync(dirPath);
   if (stats.isFile()) {
