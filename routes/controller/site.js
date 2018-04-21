@@ -14,16 +14,22 @@ exports.homepage = async function(ctx, next) {
 
 exports.file = async function(ctx, next) {
   let path = ctx.query.path || '/public';
-  dirPath = __dirname + '/../../' + path;
+  dirPath = getPath([__dirname, '..', '..', path]); //__dirname + '/../../' + path;
   let stats = fs.statSync(dirPath);
   if (stats.isFile()) {
     ctx.attachment(dirPath);
     await send(ctx, path);
   } else {
     let fileArr = findFilesSync(dirPath);
+    let pathArr = [];
+    if (path.includes('/')) {
+      pathArr = path.split('/')
+    } else {
+      pathArr = path.split('\\')
+    }
     await ctx.render('page/video/index', {
       path: path,
-      pathArr: path.split('/'),
+      pathArr: pathArr,
       fileArr: fileArr,
       join: join
     });
