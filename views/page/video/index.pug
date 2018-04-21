@@ -15,72 +15,98 @@ block content
         li
           a(href=href) #{dir}
 
-    ul.list-group
-      each file in fileArr
-        li.list-group-item
-          if file.icon == 'fa-file-video-o'
-            a.video.cursor-pointer(data-video=file.name, data-path=path)
-              - var attr = {}
-              - attr.class = file.icon
-              i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
-              | #{file.name}
-              label(style='float:right') #{file.size}
-          else  
-            a(href='/file?path=' + path + '/' + file.name)
-              - var attr = {}
-              - attr.class = file.icon
-              i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
-              | #{file.name}
-              if (file.isFile)
-                label(style='float:right') #{file.size}
-
+    .col-sm-4
+      ul.list-group(style='min-height:400px;overflow-y:auto;max-height:400px;')
+        each file in fileArr
+          li.list-group-item
+            if file.icon == 'fa-file-video-o'
+              a.video.cursor-pointer(data-video=file.name, data-path=path, data-toggle="tooltip" data-placement="bottom" title=file.name)
+                - var attr = {}
+                - attr.class = file.icon
+                i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
+                | #{file.name.length > 16 ? file.name.slice(0,4) + '...'+ file.name.slice(file.name.length - 10,file.name.length) : file.name}
+                label(style='float:right;font-size:11px') #{file.size}
+            else  
+              a(href='/file?path=' + path + '/' + file.name)
+                - var attr = {}
+                - attr.class = file.icon
+                i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
+                | #{file.name}
+                if (file.isFile)
+                  label(style='float:right;font-size:11px') #{file.size} 
+    .col-sm-8
+      #videoContainer
+      br
+      button.btn.btn-default.btn-toggle(style='display: none') 收缩
+    
+  br
   footer
     .container
       p
       | &copy; 2018 | CETCME
       i.fa.fa-value(aria-hidden='true') &nbsp;
-
-  #myModal.modal.fade.bd-example-modal-lg(tabindex="-1", role="dialog", aria-labelledby="myLargeModalLabel", aria-hidden="true")
-    .modal-dialog.modal-lg
-      #videoModal.modal-content
   
   script(type="text/javascript").
     $(function() {
       $('ul.main-nav li.small-logo a').attr('href', '/');
     })
 
+  script(type="text/javascript").
+    $(function() {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+
   script.
     var player = null
     $(document).ready(function() {
-
-      $('#myModal').on('hidden.bs.modal', function(e) {
-        if (player && player.pause) player.pause();
-      })
-
+      //- 点击播放视频
       $('a.video').click(function(e) {
-        var video = `/video?path=${$(this).data('path')}&name=${$(this).data('video')}`;// '/video?name=' + $(this).data('video');
-        var image = $(this).attr('src');
-        $('#myModal').modal('show');
+        //显示收缩按钮
+        $('.btn-toggle').css('display', '');
+
+        var videoUrl = `/video?path=${$(this).data('path')}&name=${$(this).data('video')}`;
 
         if (!player) {
           player = new DPlayer({
-            container: document.getElementById('videoModal'), 
-            screenshot: true,
+            container: document.getElementById('videoContainer'), 
             video: {
-              url: video,
-              pic: image,
-              thumbnails: image
+              url: videoUrl,
             },
             autoplay: true,
-            lang: 'zh-cn'
+            lang: 'zh-cn',
+            thumbnails: 'thumbnails.jpg',
           })
         } else {
           player.switchVideo({
-            url: video,
-            pic: image,
+            url: videoUrl,
             type: 'auto'
           })
           player.play();
         }
       })
     })
+
+  script(type="text/javascript").
+    var isSideBarShow = true;
+    $(document).ready(function (e) {
+      // 固定导航栏      
+      $('#nav-bar').scrollToFixed();
+      $('ol.breadcrumb').scrollToFixed({marginTop: 93});
+
+      // 侧边文件目录的展开和收缩
+      $('.btn-toggle').click(function () {
+        isSideBarShow = !isSideBarShow;
+        if (!isSideBarShow) {
+          $('.btn-toggle').html('展开');
+          $('.col-sm-4').css('display', 'none');
+          $('.col-sm-8').addClass('col-sm-12');
+          $('.col-sm-8').removeClass('col-sm-8');
+        } else {
+          $('.btn-toggle').html('收缩');          
+          $('.col-sm-4').css('display', '');          
+          $('.col-sm-12').addClass('col-sm-8');
+          $('.col-sm-12').removeClass('col-sm-12');
+        }
+        return false
+      });
+    });

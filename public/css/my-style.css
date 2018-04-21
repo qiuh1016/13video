@@ -6,3 +6,12 @@ a {
 .cursor-pointer {
   cursor: pointer
 }
+
+#videoContainer {
+  /* border-radius: 10px; */
+  background: url(../img/pw_maze_black_2X.png) left top repeat;
+}
+
+div.tooltip {
+  font-size: 10px;
+}
