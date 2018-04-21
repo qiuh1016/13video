@@ -2,15 +2,17 @@ const fs = require('fs');
 const moment = require('moment');
 const join = require('path').join;
 const send = require('koa-send');
+const FFmpeg = require('fluent-ffmpeg');
 
 const PassThrough = require('stream').PassThrough;
 moment.locale('zh-cn');
+
+const thumbnailFolderName = 'thumbnail';
 
 exports.homepage = async function(ctx, next) {
   await ctx.render('page/index/index', {
   });
 }
-
 
 exports.file = async function(ctx, next) {
   let path = ctx.query.path || 'public';
@@ -42,6 +44,7 @@ exports.video = async function(ctx, next) {
   let name = ctx.query.name;
   let realPath = join(path, name); //getPath(['public', 'documents', 'video', name]);
 
+
   if (ctx.headers.range) {
     let fileSize = fs.statSync(realPath).size;
     logger.info(`range: ${ctx.headers.range}; filesize: ${fileSize}`);
@@ -56,6 +59,10 @@ exports.video = async function(ctx, next) {
       var parts = range.replace(/bytes=/, '').split("-");
       var partiaStart = parts[0];
       var partialEnd = parts[1];
+
+      if (partiaStart == 0) {
+        generalThumbnail(path, name);  
+      }
 
       var start = parseInt(partiaStart);//起始位置
       //如果是bytes=0-，就是整个文件大小了
@@ -100,6 +107,13 @@ function getPath(arr) {
 /**
  * 获取文件信息
  * @param {JSON} path 
+ * fileInfo = {
+ *  isFile: '是否是文件',
+ *  name: '名称',
+ *  size: '大小',
+ *  icon: '图标class',
+ *  thumbnailExist: '缩略图是否存在'
+ * }
  */
 function findFilesSync(path) {
   let result = [];
@@ -107,8 +121,8 @@ function findFilesSync(path) {
   files.forEach((val, index) => {
       let filePath = join(path, val);
       let stats = fs.statSync(filePath);
-      if (val.substr(0, 1) != '.') {
-
+      // 去掉缩略图文件夹显示
+      if (val.substr(0, 1) != '.' && val != thumbnailFolderName) {
         let fileInfo = {
           isFile: stats.isFile(),
           name: val,
@@ -118,6 +132,13 @@ function findFilesSync(path) {
           fileInfo.icon = getIconByFileType(val);
         } else {
           fileInfo.icon = 'fa-folder-o';
+        }
+        fileInfo.thumbnailExist = false;
+        if (fileInfo.icon == 'fa-file-video-o') {
+          let thumbnailPath = join(path, join(thumbnailFolderName, val + '.png'))
+          if (fs.existsSync(thumbnailPath)) {
+            fileInfo.thumbnailExist = true;
+          }
         }
         result.push(fileInfo);
       }
@@ -182,4 +203,44 @@ function getIconByFileType(filename) {
       break;
   }
   return iconClass
+}
+
+/**
+ * 生成视频文件缩略图
+ */
+function generalThumbnail(path, filename) {
+
+  let thumbnailFolderPath = join(path, thumbnailFolderName);
+
+  if (!fs.existsSync(thumbnailFolderPath)) {
+    fs.mkdirSync(thumbnailFolderPath);
+  }
+
+  let thumbnailFilename = filename + '.png';
+  let thumbnailFilePath = join(thumbnailFolderPath, thumbnailFilename);
+
+  if (fs.existsSync(thumbnailFilePath)) {
+    logger.debug('thumbnail exists')
+    return;
+  }
+
+  let startTime = new Date().valueOf();
+  new FFmpeg({ source: join(path, filename) })
+    // .withSize('320x240')
+    .on('error', function(err) {
+      logger.error('An error occurred: ' + err.message);
+    })
+    .on('end', function(filenames) {
+      let endTime = new Date().valueOf()
+      logger.info(`Thumbnail successfully generated: ${endTime - startTime}ms`);
+    })
+    .takeScreenshots(
+      {
+          count: 1,
+          timemarks: [ '0.5' ],
+          filename: thumbnailFilename
+      },
+      thumbnailFolderPath
+  );
+
 }

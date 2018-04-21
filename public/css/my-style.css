@@ -15,3 +15,16 @@ a {
 div.tooltip {
   font-size: 10px;
 }
+
+.file-list-group {
+  min-height: 400px;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+label.video-title {
+  color: #00a79d;
+  font-size: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
