@@ -37,8 +37,8 @@ exports.video = async function(ctx, next) {
   let realPath = join(path, name); //getPath(['public', 'documents', 'video', name]);
 
   if (ctx.headers.range) {
-
     let fileSize = fs.statSync(realPath).size;
+    logger.info(`range: ${ctx.headers.range}; filesize: ${fileSize}`);
 
     function getRange(){
       var range = ctx.headers.range;

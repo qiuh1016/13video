@@ -19,7 +19,7 @@ block content
       each file in fileArr
         li.list-group-item
           if file.icon == 'fa-file-video-o'
-            a.video(href='#', data-video=file.name, data-path=path)
+            a.video.cursor-pointer(data-video=file.name, data-path=path)
               - var attr = {}
               - attr.class = file.icon
               i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
@@ -72,7 +72,7 @@ block content
               thumbnails: image
             },
             autoplay: true,
-            long: 'zh-cn'
+            lang: 'zh-cn'
           })
         } else {
           player.switchVideo({
@@ -84,4 +84,3 @@ block content
         }
       })
     })
-
