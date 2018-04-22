@@ -33,6 +33,20 @@ app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
+app.use(async (ctx) => {
+  switch (ctx.status) {
+    case 404:
+      await ctx.render('error', {
+        message: 'error',
+        error: {
+          status: ctx.status,
+          stack: 'Page Not Found'
+        }
+      });
+      break;
+  }
+})
+
 // routes
 app.use(web_router.routes(), web_router.allowedMethods())
 
