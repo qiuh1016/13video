@@ -166,7 +166,7 @@ function getIconByFileType(filename) {
     // 图片
       iconClass = 'fa-file-image-o';
       break;
-    case 'flv': case 'mp4': case 'mpg': case 'mpeg': case 'avi':
+    case 'flv': case 'mp4': case 'mpg': case 'mpeg': case 'mov':
     // 视频
       iconClass = 'fa-file-video-o';
       break;

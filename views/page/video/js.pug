@@ -1,0 +1,128 @@
+script(type="text/javascript").
+  // 让导航栏中间按钮指向首页
+  $(function() {
+    $('ul.main-nav li.small-logo a').attr('href', '/');
+  })
+
+script(type="text/javascript").
+  $(function() {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+script.
+  var player = null;
+  var $preA; 
+  
+  //- 点击播放视频
+  $('a.video').click(function(e) {
+    // li 变色
+    $(this).parent('li').css('background-color', '#00a79d');
+    $(this).css('color', '#ffffff');
+    if ($preA) {
+      $preA.parent('li').css('background-color', '#ffffff');
+      $preA.css('color', '#00a79d');
+    }
+    $preA = $(this);
+    // li 变色 end
+
+    $('.file-name').html($(this).data('name'));
+    
+    //- //显示收缩按钮
+    //- $('.btn-toggle').css('display', '');
+
+    showImageOrVideo('video');
+
+    var videoUrl = `/video?path=${$(this).data('path')}&name=${$(this).data('name')}`;
+
+    if (!player) {
+      player = new DPlayer({
+        container: document.getElementById('videoContainer'), 
+        video: {
+          url: videoUrl,
+        },
+        autoplay: true,
+        lang: 'zh-cn',
+        thumbnails: 'thumbnails.jpg',
+      })
+    } else {
+      player.switchVideo({
+        url: videoUrl,
+        type: 'auto'
+      })
+      player.play();
+    }
+  })
+
+  $('a.image').click(function(e) {
+    // li 变色
+    $(this).parent('li').css('background-color', '#00a79d');
+    $(this).css('color', '#ffffff');
+    if ($preA) {
+      $preA.parent('li').css('background-color', '#ffffff');
+      $preA.css('color', '#00a79d');
+    }
+    $preA = $(this);
+    // li 变色 end
+
+    $('.file-name').html($(this).data('name'));
+
+    if (player) player.pause();
+    showImageOrVideo('image');
+    var imageUrl = $(this).data('url');
+    
+    imageUrl = imageUrl.slice(6, imageUrl.length); // 路径中去掉'public';
+
+    //- 动态加载图片
+    var img = new Image();
+    img.src = imageUrl;
+    $("#imageContainer").html('');
+    $("#imageContainer").append(img);
+  })
+
+  function showImageOrVideo(name) {
+    if (name === 'image') {
+      $('#videoContainer').css('display', 'none');
+      $('#imageContainer').css('display', '');
+    } 
+
+    if (name === 'video') {
+      $('#videoContainer').css('display', '');
+      $('#imageContainer').css('display', 'none');
+    }
+
+  }
+
+script(type="text/javascript").
+  var isSideBarShow = true;
+  $(document).ready(function (e) {
+    // 固定导航栏      
+    $('#nav-bar').scrollToFixed();
+    $('ol.breadcrumb').scrollToFixed({marginTop: 93});
+    $('.col-sm-8').scrollToFixed({marginTop: 149});
+
+    // 侧边文件目录的展开和收缩
+    $('.btn-toggle').click(function () {
+      isSideBarShow = !isSideBarShow;
+      if (!isSideBarShow) {
+        $('.btn-toggle').html('展开');
+        $('.col-sm-4').css('display', 'none');
+        $('.col-sm-8').addClass('col-sm-12');
+        $('.col-sm-8').removeClass('col-sm-8');
+      } else {
+        $('.btn-toggle').html('收缩');          
+        $('.col-sm-4').css('display', '');          
+        $('.col-sm-12').addClass('col-sm-8');
+        $('.col-sm-12').removeClass('col-sm-12');
+      }
+      return false
+    });
+  });
+
+script.
+  // 图片懒加载
+  $(function() {
+    $("img.lazy").lazyload({
+      // effect : "fadeIn",
+      threshold : 200
+    });
+  });

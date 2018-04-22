@@ -14,22 +14,20 @@ block content
         - href = index == 0 ? href + dir : join(href, dir)
         li
           a(href=href) #{dir}
-
+  
     .col-sm-4
-      ul.list-group.file-list-group
+      ul.list-group
         each file in fileArr
           li.list-group-item
             if file.icon == 'fa-file-video-o'
               a.video.cursor-pointer(data-name=file.name, data-path=path, data-toggle="tooltip" data-placement="bottom" title=file.name)
                 - var attr = {}
                 - attr.class = file.icon
-                - var thumbnailPath = join(path, join('thumbnail', file.name + '.png'))
-                - thumbnailPath = thumbnailPath.slice(6, thumbnailPath.length)
+                - var tPath = join(path, join('thumbnail', file.name + '.png'))
+                - tPath = tPath.slice(6, tPath.length)
                 if file.thumbnailExist
-                  img(src=thumbnailPath, style='width=100px;height=80px;')
-                else
-                  i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
-                //- | #{file.name.length > 16 ? file.name.slice(0,4) + '...'+ file.name.slice(file.name.length - 10,file.name.length) : file.name}
+                  img.lazy(src='', data-original=tPath, style='margin-bottom: 5px;')
+                i.fa&attributes(attr) &nbsp;&nbsp;&nbsp;
                 | #{file.name.length > 16 ? file.name.slice(0,8) + '...'+ file.name.slice(file.name.length - 12,file.name.length) : file.name}
                 label(style='float:right;font-size:11px') #{file.size}
             else if file.icon == 'fa-file-image-o'
@@ -53,128 +51,14 @@ block content
       #imageContainer
       br
       button.btn.btn-default.btn-toggle(style='display: none') 收缩
-    
-  br
-  footer
+
+  footer(style='background: #ffffff')
+    br
     .container
       p
       | &copy; 2018 | CETCME
       i.fa.fa-value(aria-hidden='true') &nbsp;
+    br
   
-  script(type="text/javascript").
-    $(function() {
-      $('ul.main-nav li.small-logo a').attr('href', '/');
-    })
-
-  script(type="text/javascript").
-    $(function() {
-      $('[data-toggle="tooltip"]').tooltip()
-    })
-
-  script.
-    var player = null;
-    var $preA; 
-    
-    //- 点击播放视频
-    $('a.video').click(function(e) {
-      // li 变色
-      $(this).parent('li').css('background-color', '#00a79d');
-      $(this).css('color', '#ffffff');
-      if ($preA) {
-        $preA.parent('li').css('background-color', '#ffffff');
-        $preA.css('color', '#00a79d');
-      }
-      $preA = $(this);
-      // li 变色 end
-
-      $('.file-name').html($(this).data('name'));
-      
-      //- //显示收缩按钮
-      //- $('.btn-toggle').css('display', '');
-
-      showImageOrVideo('video');
-
-      var videoUrl = `/video?path=${$(this).data('path')}&name=${$(this).data('name')}`;
-
-      if (!player) {
-        player = new DPlayer({
-          container: document.getElementById('videoContainer'), 
-          video: {
-            url: videoUrl,
-          },
-          autoplay: true,
-          lang: 'zh-cn',
-          thumbnails: 'thumbnails.jpg',
-        })
-      } else {
-        player.switchVideo({
-          url: videoUrl,
-          type: 'auto'
-        })
-        player.play();
-      }
-    })
-
-    $('a.image').click(function(e) {
-      // li 变色
-      $(this).parent('li').css('background-color', '#00a79d');
-      $(this).css('color', '#ffffff');
-      if ($preA) {
-        $preA.parent('li').css('background-color', '#ffffff');
-        $preA.css('color', '#00a79d');
-      }
-      $preA = $(this);
-      // li 变色 end
-
-      $('.file-name').html($(this).data('name'));
-
-      if (player) player.pause();
-      showImageOrVideo('image');
-      var imageUrl = $(this).data('url');
-      
-      imageUrl = imageUrl.slice(6, imageUrl.length); // 路径中去掉'public';
-
-      //- 动态加载图片
-      var img = new Image();
-      img.src = imageUrl;
-      $("#imageContainer").html('');
-      $("#imageContainer").append(img);
-    })
-
-    function showImageOrVideo(name) {
-      if (name === 'image') {
-        $('#videoContainer').css('display', 'none');
-        $('#imageContainer').css('display', '');
-      } 
-
-      if (name === 'video') {
-        $('#videoContainer').css('display', '');
-        $('#imageContainer').css('display', 'none');
-      }
-
-    }
-
-  script(type="text/javascript").
-    var isSideBarShow = true;
-    $(document).ready(function (e) {
-      // 固定导航栏      
-      $('#nav-bar').scrollToFixed();
-      //- $('ol.breadcrumb').scrollToFixed({marginTop: 93});
-
-      // 侧边文件目录的展开和收缩
-      $('.btn-toggle').click(function () {
-        isSideBarShow = !isSideBarShow;
-        if (!isSideBarShow) {
-          $('.btn-toggle').html('展开');
-          $('.col-sm-4').css('display', 'none');
-          $('.col-sm-8').addClass('col-sm-12');
-          $('.col-sm-8').removeClass('col-sm-8');
-        } else {
-          $('.btn-toggle').html('收缩');          
-          $('.col-sm-4').css('display', '');          
-          $('.col-sm-12').addClass('col-sm-8');
-          $('.col-sm-12').removeClass('col-sm-12');
-        }
-        return false
-      });
-    });
+  include ./js.pug
+  
