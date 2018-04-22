@@ -126,3 +126,14 @@ script.
       threshold : 200
     });
   });
+
+script.
+  // 快捷键
+  $(document).keydown(function(e){
+    if(e.which == 37) {
+      //- alert("左");
+    }
+    if(e.which == 39) {
+      alert("右");
+    }
+  });
