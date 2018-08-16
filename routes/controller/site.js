@@ -215,3 +215,15 @@ function generalThumbnail(path, filename) {
   );
 
 }
+
+exports.showUpload = async (ctx, next) => {
+  await ctx.render('page/video/upload', {
+
+  })
+}
+
+exports.upload = async (ctx, next) => {
+  ctx.body = {
+    filename: ctx.req.file.filename // 返回文件名
+  }
+}
