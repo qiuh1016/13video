@@ -33,7 +33,7 @@ app.use(async (ctx, next) => {
   logger.info(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
-app.use(async (ctx) => {
+app.use(async (ctx, next) => {
   switch (ctx.status) {
     case 404:
       await ctx.render('error', {
@@ -45,6 +45,7 @@ app.use(async (ctx) => {
       });
       break;
   }
+  await next();
 })
 
 // routes
