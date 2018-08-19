@@ -1,6 +1,6 @@
 public/documents/*
 public/logs/*
-public/img/*
+public/upload/*
 node_modules
 
 # Ignore Mac OS desktop services store

@@ -1,6 +1,9 @@
 extends ../../layouts/default
 
 block content
-  form(action="/upload", method="post", enctype="multipart/form-data")
-    input(type="file", name="file")
-    input(type="submit", value="ok")
+  .container
+    form(action="/upload", method="post", enctype="multipart/form-data")
+      .form-group
+        label File
+        input.form-control(type="file", name="file")
+      input.btn.btn-default(type="submit", value="ok")
